@@ -29,7 +29,7 @@ async function main(): Promise<void> {
   const app = createApp();
   const port = parseInt(process.env['PORT'] || '3000', 10);
 
-  const server = app.listen(port, () => {
+  const server = app.listen(port, "0.0.0.0", () => {
     logger.info({ port, env: process.env['NODE_ENV'] }, 'Server is running');
   });
 

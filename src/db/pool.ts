@@ -6,13 +6,18 @@ if (!connectionString) {
   logger.warn('DATABASE_URL is not set; database operations may fail until it is configured');
 }
 
+// Render free-tier Postgres needs longer timeout (cold starts) and SSL
+const isRenderDB = connectionString?.includes('render.com');
+
 export const pool = new Pool({
   connectionString,
-  max: 20,
+  max: 10,
   idleTimeoutMillis: 30_000,
-  connectionTimeoutMillis: 5_000,
+  connectionTimeoutMillis: 15_000, // Render free tier can be slow on first connect
+  ssl: isRenderDB ? { rejectUnauthorized: false } : undefined,
 });
 
+console.log("Connecting to:", connectionString?.split('@')[1] || "NOT FOUND");
 pool.on('error', (err) => {
   logger.error({ err }, 'Unexpected error on idle database client');
 });

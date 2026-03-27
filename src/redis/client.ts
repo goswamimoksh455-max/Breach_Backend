@@ -7,14 +7,20 @@ if (!isRedisConfigured) {
   logger.warn('REDIS_URL is not set; Redis-backed features will be unavailable');
 }
 
+// Render Redis uses rediss:// (TLS) — ioredis needs explicit tls option
+const isRenderRedis = redisUrl?.startsWith('rediss://');
+
 export const redis = new Redis(redisUrl ?? 'redis://127.0.0.1:6379', {
   maxRetriesPerRequest: 3,
+  connectTimeout: 15_000, // Render free tier can be slow
   retryStrategy(times) {
+    if (times > 3) return null; // stop retrying after 3 attempts
     const delay = Math.min(times * 200, 5000);
     logger.warn({ attempt: times, delay }, 'Redis reconnecting...');
     return delay;
   },
   lazyConnect: true,
+  tls: isRenderRedis ? {} : undefined,
 });
 
 redis.on('connect', () => {
