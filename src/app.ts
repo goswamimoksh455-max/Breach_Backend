@@ -43,7 +43,7 @@ export function createApp(): express.Application {
   app.use('/api/v1/groups/:groupId/settlements', settlementsRouter);
   app.use('/api/v1/groups/:groupId/balances', balancesRouter);
   app.use('/api/v1/groups/:groupId/payments', paymentRouter);
-  app.use('/api/v1/groups/:groupId/nlp/parse', parseRouter);
+  app.use('/api/v1/groups/:groupId/nlp', parseRouter);
   app.use('/api/v1/receipts', receiptRoutes);
   app.use('/api/v1/blockchain', blockchainRouter);
 
