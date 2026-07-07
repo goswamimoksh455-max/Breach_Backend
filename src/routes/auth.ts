@@ -195,33 +195,76 @@ router.post('/login', async (req: Request, res: Response, next) => {
 
 router.post('/oauth/google', async (req: Request, res: Response, next) => {
   try {
-    if (!googleClient) {
-      throw new AppError('Google OAuth is not configured', 503);
-    }
-
     const idToken = String(req.body.idToken || '');
     if (!idToken) {
       throw new AppError('idToken is required', 400);
     }
 
-    const ticket = await googleClient.verifyIdToken({
-      idToken,
-      audience: googleClientId,
-    });
+    let email: string | undefined;
+    let name: string | undefined;
+    let picture: string | undefined;
 
-    const payload = ticket.getPayload();
-
-    if (!payload?.email) {
-      throw new AppError('Google account email is required', 401);
+    // Strategy 1: Try verifying as a proper Google ID token (from GoogleLogin component)
+    if (googleClient && googleClientId) {
+      try {
+        const ticket = await googleClient.verifyIdToken({
+          idToken,
+          audience: googleClientId,
+        });
+        const payload = ticket.getPayload();
+        if (payload?.email) {
+          email = payload.email;
+          name = payload.name;
+          picture = payload.picture;
+        }
+      } catch {
+        // Not a valid ID token — fall through to Strategy 2
+      }
     }
 
-    const email = normalizeEmail(payload.email);
-    let user = await findUserByEmail(email);
+    // Strategy 2: Treat it as a Google access token (from useGoogleLogin hook)
+    // Verify by calling Google's userinfo endpoint server-side
+    if (!email) {
+      try {
+        const googleRes = await fetch('https://www.googleapis.com/oauth2/v3/userinfo', {
+          headers: { Authorization: `Bearer ${idToken}` },
+        });
+
+        if (!googleRes.ok) {
+          throw new AppError('Invalid Google token', 401);
+        }
+
+        const profile = await googleRes.json() as {
+          email?: string;
+          name?: string;
+          picture?: string;
+          sub?: string;
+        };
+
+        if (!profile.email) {
+          throw new AppError('Google account email is required', 401);
+        }
+
+        email = profile.email;
+        name = profile.name;
+        picture = profile.picture;
+      } catch (err) {
+        if (err instanceof AppError) throw err;
+        throw new AppError('Failed to verify Google token', 401);
+      }
+    }
+
+    if (!email) {
+      throw new AppError('Could not verify Google token', 401);
+    }
+
+    const normalizedEmail = normalizeEmail(email);
+    let user = await findUserByEmail(normalizedEmail);
 
     if (!user) {
-      const username = await generateUniqueUsername(email);
-      const displayName = payload.name || email.split('@')[0] || username;
-      const avatarUrl = payload.picture || null;
+      const username = await generateUniqueUsername(normalizedEmail);
+      const displayName = name || normalizedEmail.split('@')[0] || username;
+      const avatarUrl = picture || null;
       const randomPasswordHash = await hashPassword(randomUUID());
 
       const inserted = await query<UserRow>(
@@ -230,10 +273,14 @@ router.post('/oauth/google', async (req: Request, res: Response, next) => {
           VALUES ($1, $2, $3, $4, $5, true)
           RETURNING id, email, username, display_name, avatar_url, password_hash
         `,
-        [email, username, randomPasswordHash, displayName, avatarUrl],
+        [normalizedEmail, username, randomPasswordHash, displayName, avatarUrl],
       );
 
       user = inserted.rows[0];
+    } else if (picture && !user.avatar_url) {
+      // Link avatar if existing user doesn't have one
+      await query('UPDATE users SET avatar_url = $1 WHERE id = $2', [picture, user.id]);
+      user.avatar_url = picture;
     }
 
     const tokens = await issueTokenPair(user.id);
