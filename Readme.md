@@ -108,8 +108,3 @@ This commit represents the fully working backend designed for deployment on Rend
 - **Q3 2026**: Banking API integrations for auto-importing transactions
 - **Q4 2026**: WhatsApp Bot launch for chat-based tracking
 - **2027**: Market expansion into Southeast Asia
-
----
-<div align="center">
-  <b>Links:</b> <a href="https://github.com/Arman0604/Nexora">GitHub</a> &bull; <a href="https://demo.nexora.app">Live Demo</a> &bull; <a href="mailto:team@nexora.app">Contact</a>
-</div>
