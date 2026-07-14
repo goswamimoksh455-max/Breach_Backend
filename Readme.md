@@ -1,34 +1,41 @@
 # Nexora: AI-Powered Expense Intelligence
 
-[cite_start]Nexora is an intelligent expense tracking platform designed to eliminate the burden of manual data entry through advanced AI[cite: 3, 61, 62]. [cite_start]It transforms traditional expense tracking into a frictionless conversation using computer vision and natural language processing[cite: 63, 86].
+Nexora is an intelligent expense tracking platform designed to eliminate the burden of manual data entry through advanced AI. It transforms traditional expense tracking into a frictionless conversation using computer vision and natural language processing.
 
 ## 🚀 Core Features
-* [cite_start]**AI Receipt Scanning**: Powered by **Gemini 2.5 Flash**, the system extracts merchant details, amounts, and line items from photos in under 2 seconds[cite: 163, 164, 165, 170].
-* [cite_start]**NLP Quick Add**: Powered by **Llama 3.3 (Groq)**, users can add expenses via voice or text commands like *"I paid ₹1500 for pizza, split equally with Alice and Bob"*[cite: 172, 173, 174, 176].
-* [cite_start]**Smart Split Logic**: Intelligent mapping of names to UUIDs for equal, percentage, or custom bill splitting[cite: 177, 178, 182, 183].
-* [cite_start]**Blockchain Audit Layer**: Utilizes **Ethereum Sepolia** to anchor a tamper-proof audit trail for all financial records[cite: 75, 76, 115, 116].
+* **AI Receipt Scanning**: Powered by **Gemini 2.5 Flash**, the system extracts merchant details, amounts, and line items from photos in under 2 seconds.
+* **NLP Quick Add**: Powered by **Llama 3.3 (Groq)**, users can add expenses via voice or text commands like *"I paid ₹1500 for pizza, split equally with Alice and Bob"*.
+* **Smart Split Logic**: Intelligent mapping of names to UUIDs for equal, percentage, or custom bill splitting.
+* **Blockchain Audit Layer**: Utilizes **Ethereum Sepolia** to anchor a tamper-proof audit trail for all financial records.
 
 ## 🛠️ Technology Stack
-* [cite_start]**Frontend**: React / Next.js with Tailwind CSS [cite: 89, 90, 92]
-* [cite_start]**Backend**: Node.js and Express.js with JWT authentication [cite: 96, 97, 99, 101]
-* [cite_start]**Database**: PostgreSQL (Primary) and Redis (Rate limiting) [cite: 104, 106, 107]
-* [cite_start]**AI Models**: Gemini 2.5 Flash (OCR) and Llama 3.3 via Groq (NLP) [cite: 111, 112, 113, 114]
-* [cite_start]**Blockchain**: Ethereum Sepolia [cite: 115]
+* **Frontend**: React / Vite with Tailwind CSS
+* **Backend**: Node.js and Express.js with JWT authentication
+* **Database**: PostgreSQL (Primary) and Redis (Rate limiting)
+* **AI Models**: Gemini 2.5 Flash (OCR) and Llama 3.3 via Groq (NLP)
+* **Blockchain**: Ethereum Sepolia
 
 ## 📈 System Architecture
-1. [cite_start]**Capture**: Snap a photo or speak a command[cite: 66, 67].
-2. [cite_start]**Processing**: AI models extract and structure data into JSON format[cite: 69, 70, 168].
-3. [cite_start]**Storage**: Data is stored in PostgreSQL, and an audit hash is anchored to the blockchain[cite: 143, 144, 145, 146].
-4. [cite_start]**Security**: Implements RBAC, input sanitization, and memory-only file storage (no files saved to disk)[cite: 152, 158, 160].
+1. **Capture**: Snap a photo or speak a command.
+2. **Processing**: AI models extract and structure data into JSON format.
+3. **Storage**: Data is stored in PostgreSQL, and an audit hash is anchored to the blockchain.
+4. **Security**: Implements RBAC, input sanitization, and memory-only file storage (no files saved to disk).
+
+## ✅ Latest Stable State (July 2026)
+This commit represents the fully working backend designed for deployment on Render, integrated with the Vercel frontend:
+- **Authentication**: Complete JWT-based login and registration (tokens returned directly on signup for auto-login).
+- **CORS Configuration**: Dynamic multi-origin support for production (`FRONTEND_URL`) and preview deployments (`*.vercel.app`).
+- **Environment Variables**: Robust startup validation. Optional integrations (like Stripe) degrade gracefully if keys are missing to prevent deployment crashes.
+- **Webhooks**: Lazy initialization for Stripe webhooks to ensure the server starts reliably.
 
 ## 🗺️ Roadmap (2026-2027)
-* [cite_start]**Q2 2026**: Multi-language support (Hindi, Tamil, Telugu) [cite: 262, 263, 288, 289]
-* [cite_start]**Q3 2026**: Banking API integrations for auto-importing transactions [cite: 271, 272, 290, 291]
-* [cite_start]**Q4 2026**: WhatsApp Bot launch for chat-based tracking [cite: 273, 274, 292, 293]
-* [cite_start]**2027**: Market expansion into Southeast Asia [cite: 282, 294, 295]
+* **Q2 2026**: Multi-language support (Hindi, Tamil, Telugu)
+* **Q3 2026**: Banking API integrations for auto-importing transactions
+* **Q4 2026**: WhatsApp Bot launch for chat-based tracking
+* **2027**: Market expansion into Southeast Asia
 
 ---
 **Links:**
-* [cite_start]**GitHub**: [github.com/nexora](https://github.com/nexora) [cite: 298, 300]
-* [cite_start]**Live Demo**: [demo.nexora.app](https://demo.nexora.app) [cite: 301, 303]
-* [cite_start]**Contact**: [team@nexora.app](mailto:team@nexora.app) [cite: 304, 306]
+* **GitHub**: [github.com/nexora](https://github.com/nexora)
+* **Live Demo**: [demo.nexora.app](https://demo.nexora.app)
+* **Contact**: [team@nexora.app](mailto:team@nexora.app)
