@@ -5,11 +5,15 @@ import { logger } from '../lib/logger.js';
 
 const router = Router();
 
-const stripe = new Stripe(process.env.STRIPE_SECRET_KEY as string, {
-  apiVersion: '2026-02-25.clover',
-});
-
-const endpointSecret = process.env.STRIPE_WEBHOOK_SECRET as string;
+// Lazy-initialize Stripe to avoid crashing at module load when keys are missing
+let _stripe: Stripe | null = null;
+function getStripe(): Stripe | null {
+  if (_stripe) return _stripe;
+  const key = process.env['STRIPE_SECRET_KEY'];
+  if (!key) return null;
+  _stripe = new Stripe(key, { apiVersion: '2026-02-25.clover' });
+  return _stripe;
+}
 
 /**
  * POST /api/v1/webhooks/stripe
@@ -20,6 +24,14 @@ router.post(
   '/stripe',
   express.raw({ type: 'application/json' }),
   async (req: Request, res: Response, next) => {
+    const stripe = getStripe();
+    const endpointSecret = process.env['STRIPE_WEBHOOK_SECRET'];
+
+    if (!stripe || !endpointSecret) {
+      res.status(503).json({ error: 'Stripe is not configured' });
+      return;
+    }
+
     const sig = req.headers['stripe-signature'];
 
     let event: Stripe.Event;
@@ -66,3 +78,4 @@ router.post(
 );
 
 export default router;
+

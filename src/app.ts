@@ -23,9 +23,47 @@ export function createApp(): express.Application {
   const app = express();
 
   app.use(helmet());
+
+  // Parse allowed origins from FRONTEND_URL (comma-separated)
+  const allowedOrigins = (process.env['FRONTEND_URL'] || '')
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean);
+
   app.use(cors({
-    origin: process.env['FRONTEND_URL'] || '*',
+    origin: (origin, callback) => {
+      // Allow requests with no origin (server-to-server, curl, health checks)
+      if (!origin) {
+        callback(null, true);
+        return;
+      }
+
+      // Check exact match against allowed origins
+      if (allowedOrigins.includes(origin)) {
+        callback(null, origin);
+        return;
+      }
+
+      // Allow any Vercel preview deployment
+      if (origin.endsWith('.vercel.app')) {
+        callback(null, origin);
+        return;
+      }
+
+      // Allow localhost for development
+      if (origin.startsWith('http://localhost:') || origin.startsWith('http://127.0.0.1:')) {
+        callback(null, origin);
+        return;
+      }
+
+      // Reject unknown origins
+      callback(new Error(`CORS: origin ${origin} not allowed`));
+    },
     credentials: true,
+    methods: ['GET', 'POST', 'PUT', 'PATCH', 'DELETE', 'OPTIONS'],
+    allowedHeaders: ['Content-Type', 'Authorization', 'X-Requested-With'],
+    exposedHeaders: ['X-RateLimit-Limit', 'X-RateLimit-Remaining', 'X-RateLimit-Reset'],
+    maxAge: 86400, // Cache preflight for 24 hours
   }));
   app.use(compression());
 

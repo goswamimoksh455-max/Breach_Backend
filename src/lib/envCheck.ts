@@ -11,8 +11,8 @@ const ENV_REQUIREMENTS: EnvRequirement[] = [
   { key: 'REDIS_URL', required: true, feature: 'core' },
   { key: 'JWT_ACCESS_SECRET', required: true, feature: 'auth' },
   { key: 'JWT_REFRESH_SECRET', required: true, feature: 'auth' },
-  { key: 'STRIPE_SECRET_KEY', required: true, feature: 'payments' },
-  { key: 'STRIPE_WEBHOOK_SECRET', required: true, feature: 'payments' },
+  { key: 'STRIPE_SECRET_KEY', required: false, feature: 'payments' },
+  { key: 'STRIPE_WEBHOOK_SECRET', required: false, feature: 'payments' },
   { key: 'GOOGLE_CLIENT_ID', required: false, feature: 'google-oauth' },
   { key: 'BLOCKCHAIN_SERVICE_URL', required: false, feature: 'blockchain' },
 ];

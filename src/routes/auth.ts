@@ -148,10 +148,14 @@ router.post('/register', async (req: Request, res: Response, next) => {
 
     const user = inserted.rows[0];
 
+    // Issue tokens so the frontend can auto-login after registration
+    const tokens = await issueTokenPair(user.id);
+
     res.status(201).json({
       status: 'success',
       data: {
         user: userToResponse(user),
+        ...tokens,
         message: 'Registration successful.',
       },
     });
